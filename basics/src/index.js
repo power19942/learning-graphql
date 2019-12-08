@@ -7,6 +7,7 @@ const typeDefs = `
         grades:[Int]!
         me: User!
         posts(query:String):[Post!]!
+        users:[User]!
     }
 
     type User {
@@ -61,6 +62,9 @@ const resolvers = {
                 age: 20
             }
         },
+        users() {
+            return users
+        },
         posts(_, args) {
 
             return args.query == null ? posts :
@@ -86,7 +90,7 @@ const resolvers = {
     User: {
         posts(parent, args, context, info) {
             console.log("User running")
-            return posts.find(post => post.id === parent.posts)
+            return posts.filter(post => post.author === parent.id)
         }
     }
 }
