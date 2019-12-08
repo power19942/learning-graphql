@@ -6,7 +6,7 @@ const typeDefs = `
         greeting(name:String):String!
         grades:[Int]!
         me: User!
-        post:Post!
+        posts(query:String):[Post!]!
     }
 
     type User {
@@ -34,12 +34,21 @@ const resolvers = {
                 age: 20
             }
         },
-        post() {
-            return {
-                id: 1,
-                title: "post",
-                body: "some text"
-            }
+        posts(_, args) {
+            let users = [{
+                    id: 1,
+                    title: "post",
+                    body: "some text"
+                },
+                {
+                    id: 1,
+                    title: "post",
+                    body: "some text"
+                },
+                new Post(2, "class post", "from class")
+            ]
+            return args.query == null ? users :
+                users.filter(post => post.title.toLowerCase().includes(args.query))
         },
         // graphql pass 4 arguments parent,args,context,info
         greeting(_, args) {
@@ -52,6 +61,13 @@ const resolvers = {
     }
 }
 
+class Post {
+    constructor(id, title, body) {
+        this.id = id
+        this.title = title
+        this.body = body
+    }
+}
 const server = new GraphQLServer({
     typeDefs,
     resolvers
