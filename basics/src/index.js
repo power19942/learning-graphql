@@ -4,6 +4,7 @@ import { GraphQLServer } from "graphql-yoga"
 const typeDefs = `
     type Query {
         greeting(name:String):String!
+        grades:[Int]!
         me: User!
         post:Post!
     }
@@ -43,8 +44,11 @@ const resolvers = {
         // graphql pass 4 arguments parent,args,context,info
         greeting(_, args) {
             return `welcome ${args.name}`
-        }
+        },
 
+        grades(parent, args, context, info) {
+            return [10, 12, 20, 30]
+        }
     }
 }
 
