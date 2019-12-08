@@ -13,17 +13,44 @@ const typeDefs = `
         id:ID!
         name:String!
         email:String!
-        age:Int
+        age:Int,
+        posts:[Post]
     }
 
     type Post {
         id:ID!
         title:String!
         body:String!
+        author:User!
     }
 `
     //resolvers
 
+let posts = [{
+        id: 1,
+        title: "post",
+        body: "some text",
+        author: '1'
+    },
+    {
+        id: 3,
+        title: "post",
+        body: "some text",
+        author: '2'
+    }
+]
+
+let users = [{
+        id: '1',
+        name: "omar",
+        email: "o@o.com"
+    },
+    {
+        id: '2',
+        name: "mhd",
+        email: "m@m.com"
+    }
+]
 const resolvers = {
     Query: {
         me() {
@@ -35,20 +62,9 @@ const resolvers = {
             }
         },
         posts(_, args) {
-            let users = [{
-                    id: 1,
-                    title: "post",
-                    body: "some text"
-                },
-                {
-                    id: 1,
-                    title: "post",
-                    body: "some text"
-                },
-                new Post(2, "class post", "from class")
-            ]
-            return args.query == null ? users :
-                users.filter(post => post.title.toLowerCase().includes(args.query))
+
+            return args.query == null ? posts :
+                posts.filter(post => post.title.toLowerCase().includes(args.query))
         },
         // graphql pass 4 arguments parent,args,context,info
         greeting(_, args) {
@@ -58,14 +74,29 @@ const resolvers = {
         grades(parent, args, context, info) {
             return [10, 12, 20, 30]
         }
+    },
+    //resolve relations for Post type
+    //this will call for each post when call relation properity
+    Post: {
+        author(parent, args, context, info) {
+            console.log("post running")
+            return users.find(user => user.id === parent.author)
+        }
+    },
+    User: {
+        posts(parent, args, context, info) {
+            console.log("User running")
+            return posts.find(post => post.id === parent.posts)
+        }
     }
 }
 
 class Post {
-    constructor(id, title, body) {
+    constructor(id, title, body, author) {
         this.id = id
         this.title = title
         this.body = body
+        this.author = author
     }
 }
 const server = new GraphQLServer({
