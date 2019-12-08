@@ -3,6 +3,7 @@ import { GraphQLServer } from "graphql-yoga"
 //type || application schema
 const typeDefs = `
     type Query {
+        greeting(name:String):String!
         me: User!
         post:Post!
     }
@@ -38,6 +39,10 @@ const resolvers = {
                 title: "post",
                 body: "some text"
             }
+        },
+        // graphql pass 4 arguments parent,args,context,info
+        greeting(_, args) {
+            return `welcome ${args.name}`
         }
 
     }
