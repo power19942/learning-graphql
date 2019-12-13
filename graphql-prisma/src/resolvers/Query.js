@@ -1,26 +1,32 @@
-const Query = {
-    users(parent, args, { db }, info) {
-        if (!args.query) {
-            return db.users
-        }
+import prisma from "../prisma"
 
-        return db.users.filter((user) => {
-            return user.name.toLowerCase().includes(args.query.toLowerCase())
-        })
+const Query = {
+    users(parent, args, { db, prisma }, info) {
+        //let users = prisma.query.users(null, null /*null will return all fields without relations*/ )
+        const opArgs = {}
+
+        if (args.query) {
+            opArgs.AND = [{
+                name_contains: args.query
+            }, {
+                email_contains: args.query
+            }]
+        }
+        return prisma.query.users(opArgs, info)
+
+        // if (!args.query) {
+        //     return db.users
+        // }
+
+        // return db.users.filter((user) => {
+        //     return user.name.toLowerCase().includes(args.query.toLowerCase())
+        // })
     },
     posts(parent, args, { db }, info) {
-        if (!args.query) {
-            return db.posts
-        }
-
-        return db.posts.filter((post) => {
-            const isTitleMatch = post.title.toLowerCase().includes(args.query.toLowerCase())
-            const isBodyMatch = post.body.toLowerCase().includes(args.query.toLowerCase())
-            return isTitleMatch || isBodyMatch
-        })
+        return prisma.query.posts(null, info)
     },
-    comments(parent, args, { db }, info) {
-        return db.comments
+    comments(parent, args, { prisma }, info) {
+        return prisma.query.comments(null, info)
     },
     me() {
         return {
